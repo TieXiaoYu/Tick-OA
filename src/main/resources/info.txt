@@ -1,0 +1,7 @@
+#GitHub Info
+login=1596913818@qq.com
+password=nnd19950523
+
+#MySQL
+username=root
+password=root

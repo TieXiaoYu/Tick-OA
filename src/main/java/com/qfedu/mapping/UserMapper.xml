@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qfedu.dao.UserDao">
+	
+	<resultMap id="VoMenuResult" type="voMenu">
+		<id column="id" property="id"></id>
+		<result column="title" property="aTitle"></result>
+		<result column="aurl" property="aUrl"></result>
+		<collection property="voMenuList" javaType="java.util.ArrayList" ofType="voMenu">
+			<id column="cid" property="id"></id>
+			<result column="ctitle" property="aTitle"></result>
+			<result column="curl" property="aUrl"></result>
+		</collection>
+	</resultMap>
+
+	<resultMap id="VoUserResult" type="voUser">
+		<id column="id" property="id"></id>
+		<result column="no" property="no"></result>
+		<result column="name" property="name"></result>
+		<result column="role" property="role"></result>
+		<result column="flag" property="flag"></result>
+		<result column="rid" property="rid"></result>
+	</resultMap>
+	
+	
+	<select id="findByName" parameterType="string" resultType="user">
+		select * from t_user where no=#{no}
+	</select>
+
+	<!--查询用户角色-->
+	<select id="findAll" parameterType="java.lang.String"  resultMap="VoUserResult">
+		select u.id,u.no,u.name,u.flag,r.info role,r.id rid from t_role r
+		INNER JOIN t_userrole ur
+		on ur.rid = r.id
+		INNER JOIN t_user u
+		on u.id = ur.uid
+		<where>
+			<if test="no != null and no != ''">
+				and no = #{no}
+			</if>
+		</where>
+	</select>
+
+	<!--查询用户权限-->
+	<!--在建表时，需要注意将父菜单的权限描述的值更新为null 要不然出现权限为空的错误-->
+	<select id="findPermsByName" parameterType="string" resultMap="VoMenuResult">
+		select a.id,a.title,a.aurl,c.id cid,c.title ctitle,c.aurl curl from t_authority a
+		INNER JOIN t_authority c
+		on a.id = c.parentId
+		INNER JOIN t_roleauthority ra
+		on ra.aid = c.id
+		INNER JOIN t_userrole ur
+		on ur.rid = ra.rid
+		INNER JOIN t_user u
+		on u.id = ur.uid
+		where u.id = #{id}
+	</select>
+
+	<select id="findLogList" parameterType="java.lang.String" resultType="loginInfo">
+		select log.* from t_loginlog log
+		inner join t_user u
+		on u.no = log.no
+		where u.id = #{id}
+	</select>
+
+	<select id="findAllRole" resultType="role">
+		select * from t_role
+	</select>
+
+	<select id="findAllAuthority" resultType="authority">
+		select * from t_authority
+	</select>
+
+	<select id="findAllParentAutho" resultType="voMenu">
+		select id,aurl aUrl,title aTitle from t_authority where parentId = 0
+	</select>
+
+	<select id="chaAuthorityByParentId" parameterType="string" resultType="java.lang.Integer">
+		select id from t_authority where parentId = #{id}
+	</select>
+
+	<select id="chaAuthorityById" parameterType="string" resultType="authority">
+		select * from t_authority where id = #{id}
+	</select>
+
+	<insert id="insert" parameterType="loginInfo">
+		insert into t_loginlog values(null,#{ip},#{no},#{createtime},#{location})
+	</insert>
+
+	<insert id="authorityAdd" parameterType="authority">
+		insert into t_authority values(null,#{aicon},#{aurl},#{parentId},#{title},#{type})
+	</insert>
+
+	<insert id="updateRole">
+		insert into t_userrole values
+		<foreach collection="params.keys" item="key" index="index" open="" separator="," close="">
+			(#{params[${key}]},#{key})
+		</foreach>
+	</insert>
+
+	<update id="updateAutho" parameterType="authority">
+		update t_authority set aicon = #{aicon},
+			<if test="aurl != null and aurl != ''">
+				aurl = #{aurl},
+			</if>
+			<if test="parentId >= 0">
+				parentId = #{parentId},
+			</if>
+			<if test="title != null and title != ''">
+				title = #{title},
+			</if>
+		type = #{type}
+		where id = #{id}
+	</update>
+
+	<delete id="delRole" parameterType="java.lang.Integer">
+		delete from t_userrole where uid = #{id}
+	</delete>
+
+	<delete id="delUser" parameterType="java.lang.Integer">
+		delete from t_user where id = #{id}
+	</delete>
+
+	<delete id="delAuthorityByParentId" parameterType="string">
+		delete from t_authority where parentId = #{id}
+	</delete>
+
+	<delete id="delAuthorityById" parameterType="string">
+		delete from t_authority where id = #{id}
+	</delete>
+
+	<delete id="delRoleByAidList" parameterType="java.util.List">
+		delete from t_roleauthority where aid in
+		<foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="delRoleByAid" parameterType="string">
+		delete from t_roleauthority where aid = #{id}
+	</delete>
+</mapper>

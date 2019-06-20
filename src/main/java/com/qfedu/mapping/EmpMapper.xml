@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qfedu.dao.EmpDao">
+    
+    <resultMap id="EmpResult" type="empThings">
+        <id column="id" property="id"></id>
+        <result column="info" property="info"></result>
+        <result column="type" property="type"></result>
+        <result column="startname" property="startname"></result>
+        <result column="startno" property="startno"></result>
+        <result column="startdate" property="startDateStr"></result>
+        <result column="enddate" property="endDateStr"></result>
+        <result column="days" property="days"></result>
+        <result column="pid" property="pid"></result>
+        <result column="flag" property="flag"></result>
+    </resultMap>
+
+    <select id="findAll" parameterType="string" resultMap="EmpResult">
+        select * from t_check
+        <where>
+            <if test="flag != null and flag != ''">
+                flag = 1
+            </if>
+        </where>
+    </select>
+
+    <select id="departAll" resultType="user">
+        select * from t_user where flag = 1;
+    </select>
+
+    <update id="processUpdate" parameterType="map">
+        update t_check set flag = #{flag} where id = #{id}
+    </update>
+
+    <insert id="processAdd" parameterType="empThings">
+        insert into t_check values(null,#{info},#{type},#{startname},#{startno},#{startDateStr},#{endDateStr},#{days},17501,#{flag})
+    </insert>
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+    <settings>
+        <!-- spring和mybatis整合后，需要指定使用的日志类 -->
+        <setting name="logImpl" value="log4j"/>
+    </settings>
+
+    <!-- 设置类型的别名 -->
+    <typeAliases>
+        <!-- <typeAlias type="com.qianfeng.crud.Employee" alias="employee"/> -->
+        <package name="com.qfedu.pojo"></package>
+        <package name="com.qfedu.vo"></package>
+    </typeAliases>
+
+    <!--
+    plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下:
+    properties?, settings?,
+    typeAliases?, typeHandlers?,
+    objectFactory?,objectWrapperFactory?,
+    plugins?,
+    environments?, databaseIdProvider?, mappers?
+-->
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+
+            <!--配置本地的数据库类型-->
+            <property name="helperDialect" value="mysql"/>
+        </plugin>
+    </plugins>
+
+
+</configuration>
+
+

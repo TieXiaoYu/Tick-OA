@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qfedu.dao.CourseMapper">
+    <resultMap id="resulrCourse" type="com.qfedu.pojo.Course">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="flag" property="flag"></result>
+        <result column="week" property="week"></result>
+        <result column="createdate" property="createdate"></result>
+        <result column="type" property="typeId"></result>
+        <association property="type" resultMap="com.qfedu.dao.TypeMapper.resultType">
+        </association>
+    </resultMap>
+
+
+    <select id="courseList" resultMap="resulrCourse">
+        select A.*,B.tname from t_course A,t_course_type B where A.type=B.cid  ORDER BY A.id
+    </select>
+
+    <select id="courseDelete" parameterType="Integer">
+        delete from t_course where id=#{id}
+    </select>
+    <update id="courseUpdate" parameterType="course">
+        UPDATE t_course set name=#{name},week=#{week},type=#{typeId} WHERE id=#{id}
+    </update>
+
+    <insert id="courseAdd" parameterType="course">
+        INSERT INTO t_course VALUES (null,#{name},#{flag},#{week},#{createdate},#{typeId})
+    </insert>
+    </mapper>

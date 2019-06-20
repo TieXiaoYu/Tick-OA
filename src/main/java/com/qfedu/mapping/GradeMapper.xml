@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qfedu.dao.GradeMapper">
+    <resultMap id="resultGrade" type="com.qfedu.pojo.Grade">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="flag" property="flag"></result>
+        <result column="week" property="week"></result>
+        <result column="createdate" property="createdate"></result>
+        <result column="location" property="location"></result>
+        <result column="cid" property="cid"></result>
+        <result column="count" property="count"></result>
+        <association property="course" javaType="com.qfedu.pojo.Course">
+            <result property="name" column="cname"></result>
+        </association>
+    </resultMap>
+
+    <select id="gradeList" resultMap="resultGrade">
+        select A.*,B.name as cname FROM t_grade A ,t_course B where A.cid = B.id
+    </select>
+
+    <delete id="gradedelete" parameterType="Integer" >
+        DELETE from t_grade WHERE id=#{id}
+    </delete>
+
+    <update id="gradeUpdate" parameterType="grade">
+        UPDATE t_grade set name=#{name},week=#{week},location=#{location} WHERE id=#{id}
+    </update>
+
+    <update id="gradeadd" parameterType="grade">
+        insert INTO t_grade VALUES (null,#{name},#{flag},#{week},#{createdate},#{location},#{cid},#{count})
+    </update>
+    </mapper>

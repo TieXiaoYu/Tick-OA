@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qfedu.dao.StudentMapper">
+    <resultMap id="resultStudent" type="com.qfedu.pojo.Student">
+        <id column="no" property="no"></id>
+        <result column="name" property="name"></result>
+        <result column="sex" property="sex"></result>
+        <result column="birthday" property="birthday"></result>
+        <result column="cardno" property="cardno"></result>
+        <result column="school" property="school"></result>
+        <result column="education" property="education"></result>
+        <result column="phone" property="phone"></result>
+        <result column="email" property="email"></result>
+        <result column="flag" property="flag"></result>
+        <result column="introno" property="introno"></result>
+        <result column="qq" property="qq"></result>
+        <result column="gid" property="gid"></result>
+        <result column="createdate" property="createdate"></result>
+        <result column="photo" property="photo"></result>
+        <result column="tno" property="tno"></result>
+        <association property="grade" javaType="com.qfedu.pojo.Grade">
+            <result property="name" column="gname"></result>
+        </association>
+    </resultMap>
+
+    <select id="studentList" resultMap="resultStudent">
+        SELECT A.* ,B.name as gname from t_student A, t_grade B where A.gid = B.id
+    </select>
+
+    <insert id="addStus" parameterType="list">
+        insert INTO t_student VALUES
+        <foreach collection="list" item="stu" separator=",">
+            (#{stu.no},#{stu.name},#{stu.sex},#{stu.birthday},#{stu.cardno},#{stu.school},#{stu.education},#{stu.phone},#{stu.email},#{stu.flag},#{stu.introno},#{stu.qq},#{stu.gid},#{stu.createdate},#{stu.photo},#{stu.tno})
+        </foreach>
+    </insert>
+    <delete id="gradedelete" parameterType="String">
+        DELETE FROM t_student WHERE no =#{no}
+    </delete>
+
+    <insert id="studentadd" parameterType="student">
+        insert INTO t_student VALUES
+        (#{no},#{name},#{sex},#{birthday},#{cardno},
+        #{school},#{education},#{phone},#{email},#{flag},#{introno},#{qq},
+        #{gid},#{createdate},#{photo},#{tno})
+    </insert>
+    </mapper>

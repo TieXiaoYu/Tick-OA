@@ -8,15 +8,15 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="stylesheet" href="media/layui/css/layui.css" media="all">
-<script type="text/javascript" src="media/js/jquery.min.js"></script>
 </head>
 <body>
 	<div class="layui-container">
-		<form class="layui-form" action="staffadd.do" method="post">
+		<form class="layui-form" id="staffedit" action="staffadd.do" method="post" onsubmit="return false">
 			<div class="layui-form-item">
 				<label class="layui-form-label">员工姓名</label>
 				<div class="layui-input-block">
-					<input type="text" name="name" lay-verify="name" autocomplete="off"
+				<input type="hidden" name="no" id="no">
+					<input type="text" id="name" name="staffname"  lay-verify="name" autocomplete="off"
 						placeholder="请输入姓名" class="layui-input">
 				</div>
 			</div>
@@ -56,86 +56,117 @@
 	  		<div class="layui-form-item">
 	             <label class="layui-form-label">入职日期</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="createdate" id="date" autocomplete="off" class="layui-input">
+                    <input type="date" name="createdate" id="date" autocomplete="off" class="layui-input">
                 </div>
 	        </div>
  			<div class="layui-form-item">
  				 <label class="layui-form-label">照片</label>
- 				 <button type="button" class="layui-btn" id="upfile">
-				  <i class="layui-icon">&#xe67c;</i>上传图片
-				</button>
-				<input type="hidden" name="photo" id="p1">
+ 				 <input type="file" name="file" class="layui-btn"  id="upfile">
  				 <div class="layui-input-block">
- 				 	<img alt="个人一寸照片"  id="img1" width="200px" height="300px">
+ 				 	<img alt=""  id="img" width="200px" height="300px">
  				 </div>
- 			</div>
-			<div class="layui-form-item">
-				<input class="layui-btn" style="margin-left: 10%"  id="btn1" disabled="disabled" type="submit" value="确认新增">
-			</div>
+ 			</div> 
+
 		</form>
 	</div>
 
-
+	<script type="text/javascript" src="media/js/jquery.min.js"></script>
+	<script src="media/js/jquery.form.min.js"></script>
 	<script src="media/layui/layui.js"></script>
 	<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
 	<script>
 	var form;
-		layui
-				.use(
-						[ 'form','upload', 'layedit', 'laydate' ],
-						function() {
-							form = layui.form, layer = layui.layer, layedit = layui.layedit, laydate = layui.laydate;
-							var upload = layui.upload;
-							   
-							  //执行实例
-							  var uploadInst = upload.render({
-							    elem: '#upfile' //绑定元素
-							    ,url: 'photoupload.do' //上传接口
-							    ,done: function(obj){
-							      //上传完毕回调
-							      console.log(obj);
-							      if(obj.code==1000){
-							    	  $("#p1").val(obj.msg);
-								      $("#img1")[0].src="/tickresource/"+obj.msg;
-							      	  $("#btn1").attr("disabled",false);
-							      }else{
-							    	  $("#img1")[0].src="media/images/cw1.jpg";
-							      }
-							      
-							    }
-							    ,error: function(){
-							      //请求异常回调
-							    }
-							  });
-							//日期
-							laydate.render({
-								elem : '#date'
-							});
-							
+	layui.use([ 'form','upload', 'layedit', 'laydate' ],function() {
+		form = layui.form, layer = layui.layer, layedit = layui.layedit;
+		var upload = layui.upload;
 
-							//自定义验证规则
-							form.verify({
-								title : function(value) {
-									if (value.length < 5) {
-										return '标题至少得5个字符啊';
-									}
-								},
-								pass : [ /(.+){6,12}$/, '密码必须6到12位' ],
-								content : function(value) {
-									layedit.sync(editIndex);
-								}
-							});
-					initData();
-		});
-		//初始化数据
-		function initData() {
-			$.get("departall.do",null,function(arr){
-				for(i=0;i<arr.length;i++){
-					$("#cds").append("<option value='"+arr[i].id+"'>"+arr[i].name+"</option>");
+		//自定义验证规则
+		form.verify({
+			title : function(value) {
+				if (value.length < 5) {
+					return '标题至少得5个字符啊';
 				}
-				form.render("select");
-			})
-		}
-	</script>
+			},
+			pass : [ /(.+){6,12}$/, '密码必须6到12位' ],
+			content : function(value) {
+				layedit.sync(editIndex);
+			}
+		});
+		initData();
+	});
+	//初始化数据
+	function initData() {
+		//初始化要编辑的员工信息
+		var id=window.location.search.substr(4);
+		$.get("/staff/selectstaffbyid.do?id="+id,null,function(data){
+			$("#name").val(data.name);
+			//初始化部门下拉框
+			$.ajax({
+                   url: "/depart/departall.do",
+                   async:false,
+                   success: function (arr) {
+                  	 for(i=0;i<arr.length;i++){
+       					if(arr[i].id == data.did){
+       						$("#cds").append("<option value='"+arr[i].id+"' selected>"+arr[i].name+"</option>");
+       					}else{
+       						$("#cds").append("<option value='"+arr[i].id+"'>"+arr[i].name+"</option>");
+       						
+       					}
+       				} 
+                   }
+               });
+			
+			$('[name=sex]').each(function(i,item){
+				if($(item).val()==data.sex){
+					$(item).prop('checked',true);
+						form.render("radio");
+				}
+			});
+			
+			$("input[name=no]").val(data.no);
+			$("input[name=email]").val(data.email);
+			$("input[name=qq]").val(data.qq);
+			$("input[name=phone]").val(data.phone);
+			$("input[name=createdate]").val(data.createdate);
+			$("input[name=createdate]").val(data.createdate);
+			form.render("select");
+		})
+		
+		
+		$(function() {
+			$('#upfile').change(function(event) {
+			    // 根据这个 <input> 获取文件的 HTML5 js 对象
+			    var files = event.target.files, file;        
+			    if (files && files.length > 0) {
+			      // 获取目前上传的文件
+			      file = files[0];
+			      // 来在控制台看看到底这个对象是什么
+			      console.log("******");
+			      console.log(file);
+			      console.log("******");
+			      // 那么我们可以做一下诸如文件大小校验的动作
+			      if(file.size > 1024 * 1024 * 2) {
+			        alert('图片大小不能超过 2MB!');
+			        return false;
+			      }
+			      // !!!!!!
+			      // 下面是关键的关键，通过这个 file 对象生成一个可用的图像 URL
+			      // 获取 window 的 URL 工具
+			      var URL = window.URL || window.webkitURL;
+			      // 通过 file 生成目标 url
+			      var imgURL = URL.createObjectURL(file);
+			      // 用这个 URL 产生一个 <img> 将其显示出来
+			      $('#img').attr('src', imgURL);
+			      // 使用下面这句可以在内存中释放对此 url 的伺服，跑了之后那个 URL 就无效了
+			      // URL.revokeObjectURL(imgURL);
+			    }
+			  });
+		})
+			
+		 
+		
+		
+	}
+</script>
 </body>
 </html>

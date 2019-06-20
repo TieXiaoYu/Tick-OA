@@ -46,4 +46,5 @@ public class StudentServiceImpl implements StudentService {
         student.setFlag(1);
         studentMapper.studentadd(student);
     }
+
 }

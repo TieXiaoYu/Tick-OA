@@ -13,4 +13,6 @@ public interface StudentService {
     void gradedelete(String no);
 
     void studentadd(Student student);
+
+
 }

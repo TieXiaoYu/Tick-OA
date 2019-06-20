@@ -13,4 +13,5 @@ public interface StudentMapper {
     void gradedelete(String no);
 
     void studentadd(Student student);
+
 }

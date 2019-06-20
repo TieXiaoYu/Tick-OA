@@ -171,9 +171,9 @@ public class UserController {
 
         return "index";
     }
-    @RequestMapping("/logOut")
+    @RequestMapping("/loginOut")
+    @ResponseBody
     public JsonBean logout(HttpServletRequest request){
-
         request.getSession().removeAttribute("userInfo");
         request.getSession().removeAttribute("id");
         return new JsonBean(1,null);

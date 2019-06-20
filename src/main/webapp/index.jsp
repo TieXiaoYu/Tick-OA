@@ -62,7 +62,7 @@
                     <dd><a href="javascript:showTab(1002,'user.html','修改密码');">修改密码</a></dd>
                 </dl>
             </li>
-            <li class="layui-nav-item"><a href="user/loginOut.do">注销</a></li>
+            <li class="layui-nav-item"><a href="javascript:logOut();">注销</a></li>
         </ul>
     </div>
 
@@ -158,6 +158,21 @@
     $(function () {
         loadPage();
     });
+</script>
+<script type="text/javascript">
+    function logOut() {
+        if (confirm("确定要退出吗？")) {
+            $.ajax({
+                type: "get",
+                url: "user/loginOut",
+                success: function (data) {
+                    if (data.code == 1) {
+                        top.location.href = "login.html";
+                    }
+                }
+            })
+        }
+    }
 </script>
 <script>
     function flexible() {

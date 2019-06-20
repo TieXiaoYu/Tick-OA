@@ -159,6 +159,16 @@
         loadPage();
     });
 </script>
+<script>
+    function flexible() {
+
+        $("body").toggleClass("big-page");
+
+    }
+</script>
+<style>
+    .big-page .layui-layout-admin .layui-side{top:60px;width:0px;overflow-x:hidden}
+</style>
 </body>
 
 </html>
